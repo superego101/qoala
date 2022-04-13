@@ -1,0 +1,1 @@
+This is a directory to store all temporary files. Delete the contents of the directory periodically.
