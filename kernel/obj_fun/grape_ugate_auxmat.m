@@ -147,7 +147,12 @@ if strcmp(param.space,'liouville')
     end
 
     % calculate the fidelity
-    fdty = real(trace(targ'*fwd_traj))/nrm;
+    if strcmp(param.fidelity,'real')
+        fdty = real(trace(targ'*fwd_traj))/nrm;
+    elseif strcmp(param.fidelity,'square')
+        fdty_overlap = (trace(targ'*fwd_traj))/nrm;
+        fdty = fdty_overlap*conj(fdty_overlap);
+    end
 
 elseif strcmp(param.space,'hilbert')
 
@@ -201,7 +206,12 @@ elseif strcmp(param.space,'hilbert')
     end
 
     % calculate the fidelity
-    fdty = trace(real(targ'*fwd_traj))/nrm;
+    if strcmp(param.fidelity,'real')
+        fdty = real(trace(targ'*fwd_traj))/nrm;
+    elseif strcmp(param.fidelity,'square')
+        fdty_overlap = (trace(targ'*fwd_traj))/nrm;
+        fdty = fdty_overlap*conj(fdty_overlap);
+    end
 
 end
 
@@ -221,7 +231,13 @@ if strcmp(param.space,'liouville')
 
             % calculate the gradient elements
             for k=1:kctrls
-                grad(n,k) = amps(k)*real(trace(bwd_trajn'*dP_rho{k}(:,:,n)))/nrm;
+                
+                if strcmp(param.fidelity,'real')
+                    grad(n,k) = amps(k)*real(trace(bwd_trajn'*dP_rho{k}(:,:,n)))/nrm;
+                elseif strcmp(param.fidelity,'square')
+                    grad_overlap = (trace(bwd_trajn'*dP_rho{k}(:,:,n)))/nrm;
+                    grad(n,k)=amps(k)*real(grad_overlap*conj(fdty_overlap)+fdty_overlap*conj(grad_overlap));
+                end
 
                 % add the current controls
                 L=L+wf(n,k)*ctrls{k};

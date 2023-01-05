@@ -58,7 +58,12 @@ for n=1:nsteps
 end
 
 % calculate the fidelity
-fidelity = real(trace(rho_targ'*fwd_traj(:,:,end)))/nrm;
+if strcmp(ctrl_sys.fidelity,'real')
+    fidelity = real(trace(rho_targ'*fwd_traj(:,:,end)))/nrm;
+elseif strcmp(ctrl_sys.fidelity,'square')
+    fdty_overlap = (trace(rho_targ'*fwd_traj(:,:,end)))/nrm;
+    fidelity = fdty_overlap*conj(fdty_overlap);
+end
 
 % Return trajectory data
 data.trajectory.final=squeeze(fwd_traj(:,:,end));

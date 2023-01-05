@@ -603,7 +603,12 @@ else, error('this version of escalade is only coded for Liouville space');
 end
 
 % calculate the fidelity
-fdty = real(trace(targ'*fwd_traj{end}))/dim;
+if strcmp(param.fidelity,'real')
+    fdty = real(trace(targ'*fwd_traj{end}))/dim;
+elseif strcmp(param.fidelity,'square')
+    fdty_overlap = (trace(targ'*fwd_traj{end}))/dim;
+    fdty = fdty_overlap*conj(fdty_overlap);
+end
 
 end
 
@@ -738,7 +743,12 @@ if nargin<10
 end
 
 % calculate the fidelity
-fdty = real(trace(targ'*fwd_traj{end}))/dim;
+if strcmp(param.fidelity,'real')
+    fdty = real(trace(targ'*fwd_traj{end}))/dim;
+elseif strcmp(param.fidelity,'square')
+    fdty_overlap = (trace(targ'*fwd_traj{end}))/dim;
+    fdty = fdty_overlap*conj(fdty_overlap);
+end
 
 % preallocate space for backward split trajectory within the time step
 bwd_split=cell(length(ind_spn),1);
@@ -807,7 +817,12 @@ if strcmp(state_space,'liouville')
             % (no trotterisation coded here)
             for i=1:num_a
                 rho_n=dP_n{ind_spn(i),1}*fwd_split{i,n};
-                grad_col(k)=grad_col(k)+amps(k)*real(trace(bwd_split{num_b-i}'*rho_n))/dim;
+                if strcmp(param.fidelity,'real')
+                    grad_col(k)=grad_col(k)+amps(k)*real(trace(bwd_split{num_b-i}'*rho_n))/dim;
+                elseif strcmp(param.fidelity,'square')
+                    grad_overlap = (trace(bwd_split{num_b-i}'*rho_n))/dim;
+                    grad_col(k)=grad_col(k)+amps(k)*real(grad_overlap*conj(fdty_overlap)+fdty_overlap*conj(grad_overlap));
+                end
             end
 
         end
